@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recreating Styled Components</title>
+</head>
+<body>
+    <div id="container"></div>
+    <script>
+        function render(component, container) {
+            container.innerHTML = component
+        }
+        function component(strings, ...dynamicValues) {
+            return function (props) {
+                let newContent = strings.slice()
+                dynamicValues.forEach((value, index) => {
+                    newContent[index] += props[value]
+                })
+                return newContent.join('')
+            }
+        }
+        const props = {
+            message: 'My prop message',
+        }
+        // My solution ✌️ ✌️
+        const tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'small', 'header', 'main'];
+        const myStyled = {};
+        tags.forEach((tag, index) => {
+            myStyled[tag] = function (styles) {
+                return function (content) {
+                    return `
+                        <${tag} style="${styles}">${content}</${tag}>
+                    `
+                }
+            }
+        })
+        
+        // Leonidas Example
+        /*const styled = {
+            h1: function (styles) {
+                return function (content) {
+                    return `
+                        <h1 style="${styles}">${content}</h1>
+                    `
+                }
+            },
+            h2: '',
+            h3: '',
+        }*/
+       const TitleStyled = myStyled.main`
+            font-family: system-ui;
+            color: orange;
+            font-size: 40px;
+            text-shadow: 2px 2px 0 black;
+            line-height: 100vh;
+        `
+        const Title = component`<marquee> ${'message'} </marquee>`(props)
+        render(TitleStyled(Title), window.container)
+    </script>
+</body>
+</html>
